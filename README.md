@@ -17,6 +17,20 @@ Aplikasi kasir web dengan Laravel 12, API JSON, dan MySQL. Antarmuka kasir ada d
 5. Untuk database baru, buat akun pertama dengan `php artisan pos:create-initial-accounts`. Perintah ini membuat owner dan kasir awal, lalu menampilkan password acak satu kali. Simpan kredensial tersebut.
 6. Jalankan `php artisan serve`, buka `http://127.0.0.1:8000`, lalu login memakai username dan password yang ditampilkan.
 
+## Deploy ke Vercel
+
+Proyek ini berjalan sebagai aplikasi Laravel di container FrankenPHP; Vercel membangun asset Vite dari `resources` saat image dibuat. Root Directory Vercel harus menunjuk ke folder proyek ini.
+
+Tambahkan environment variables berikut di **Vercel Project Settings → Environment Variables**:
+
+- `APP_KEY`: hasil `php artisan key:generate --show` dari mesin lokal.
+- `APP_URL`: URL deployment Vercel.
+- `DB_CONNECTION=mysql`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD`: koneksi ke database MySQL yang dapat diakses dari internet. MySQL lokal XAMPP tidak dapat digunakan langsung oleh deployment.
+- `SESSION_DRIVER=database`, `CACHE_STORE=database`, dan `QUEUE_CONNECTION=database` agar data tidak bergantung pada filesystem container yang sementara.
+- `MIDTRANS_SERVER_KEY` dan `MIDTRANS_BASE_URL` jika pembayaran QRIS diaktifkan.
+
+Setelah database eksternal siap, jalankan `php artisan migrate --force` satu kali dengan kredensial database produksi. Setelah mengimpor repo, deploy ulang di Vercel. File `vercel.json` mengarahkan trafik ke container Laravel sehingga Vercel tidak mencari folder output statis `dist`.
+
 ## QRIS Midtrans
 
 QRIS dinamis memerlukan akun merchant Midtrans yang sudah mengaktifkan QRIS. Pengembangan memakai sandbox terlebih dahulu. Isi `.env`:
